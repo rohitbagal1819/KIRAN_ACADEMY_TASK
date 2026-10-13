@@ -1,55 +1,169 @@
-
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Employee Form</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kiran Academy - Employee Manager</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+--bg:#eef2f7;--card:#fff;--text:#1f2937;--muted:#6b7280;--line:#e5e7eb;--accent:#2563eb;--accent-h:#1d4ed8;--danger:#dc2626;--head:#f3f4f6}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f172a;--card:#1e293b;--text:#e5e7eb;--muted:#94a3b8;--line:#334155;--accent:#3b82f6;--accent-h:#60a5fa;--danger:#f87171;--head:#273449}}
+:root[data-theme="dark"]{--bg:#0f172a;--card:#1e293b;--text:#e5e7eb;--muted:#94a3b8;--line:#334155;--accent:#3b82f6;--accent-h:#60a5fa;--danger:#f87171;--head:#273449}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;line-height:1.4}
+.wrap{max-width:900px;margin:0 auto;padding:20px 14px 40px}
+header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+h1{font-size:1.4rem;margin:0}
+.card{background:var(--card);border-radius:12px;padding:20px;margin-bottom:18px;box-shadow:0 2px 10px rgba(0,0,0,.08)}
+h2{font-size:1.1rem;margin:0 0 14px;padding-bottom:6px;border-bottom:2px solid var(--accent)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:18px}
+.stat{background:var(--card);border-radius:12px;padding:14px;box-shadow:0 2px 10px rgba(0,0,0,.08)}
+.stat span{display:block;color:var(--muted);font-size:.8rem}
+.stat b{font-size:1.3rem}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:600px){.grid{grid-template-columns:1fr}}
+label{display:block;font-weight:600;font-size:.85rem;margin-bottom:4px}
+input,select{width:100%;padding:10px;border:1px solid var(--line);border-radius:6px;background:var(--card);color:var(--text);font-size:.95rem}
+input:focus,select:focus{outline:2px solid var(--accent);border-color:transparent}
+.err{color:var(--danger);font-size:.75rem;min-height:1em;display:block;margin-top:2px}
+.btn{padding:10px 16px;border:0;border-radius:6px;background:var(--accent);color:#fff;font-weight:600;cursor:pointer;font-size:.95rem}
+.btn:hover{background:var(--accent-h)}
+.btn.sec{background:transparent;color:var(--text);border:1px solid var(--line)}
+.btn.sm{padding:5px 10px;font-size:.8rem}
+.btn.del{background:var(--danger)}
+.actions{display:flex;gap:8px;margin-top:6px}
+.actions .btn:first-child{flex:1}
+.tools{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.tools input{flex:1;min-width:140px}
+.tools select{width:auto}
+.tbl{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.92rem}
+th,td{text-align:left;padding:10px;border:1px solid var(--line);white-space:nowrap}
+th{background:var(--head);cursor:pointer;user-select:none}
+td.a{display:flex;gap:6px}
+.empty{text-align:center;color:var(--muted);padding:18px}
+#toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:#111827;color:#fff;padding:10px 16px;border-radius:8px;opacity:0;transition:.25s;pointer-events:none}
+#toast.show{opacity:1}
+</style>
 </head>
 <body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>🎓 Kiran Academy</h1>
+      <div style="color:var(--muted);font-size:.9rem;margin-top:2px">Tutor: <b style="color:var(--accent)">Tejas Sir</b> &middot; Employee Manager</div>
+    </div>
+    <button class="btn sec sm" id="theme">🌓 Theme</button>
+  </header>
 
-    <h2>Form</h2>
+  <div class="stats">
+    <div class="stat"><span>Total Employees</span><b id="sCount">0</b></div>
+    <div class="stat"><span>Total Payroll</span><b id="sTotal">0</b></div>
+    <div class="stat"><span>Average Salary</span><b id="sAvg">0</b></div>
+    <div class="stat"><span>Highest Paid</span><b id="sMax">-</b></div>
+  </div>
 
-    <form id="form">
-        Enter ID: <input type="number" id="id" required><br><br>
-        Enter Name: <input type="text" id="name" required><br><br>
-        Enter Role: <input type="text" id="role" required><br><br>
-        Enter Salary: <input type="number" id="salary" required><br><br>
+  <div class="card">
+    <h2 id="formTitle">1) Employee Form</h2>
+    <div class="grid">
+      <div><label for="id">Employee ID:</label><input id="id" type="number" placeholder="Enter ID"><span class="err" id="eId"></span></div>
+      <div><label for="name">Employee Name:</label><input id="name" placeholder="Enter Name"><span class="err" id="eName"></span></div>
+      <div><label for="role">Role:</label>
+        <select id="role"><option value="">Select Role</option><option>Tester</option><option>Developer</option><option>Designer</option><option>DevOps</option><option>Manager</option><option>HR</option></select>
+        <span class="err" id="eRole"></span></div>
+      <div><label for="salary">Salary:</label><input id="salary" type="number" placeholder="Enter Salary"><span class="err" id="eSal"></span></div>
+    </div>
+    <div class="actions">
+      <button class="btn" id="save">Add Employee</button>
+      <button class="btn sec" id="cancel" style="display:none">Cancel</button>
+    </div>
+  </div>
 
-        <button type="submit">Submit</button>
-    </form>
+  <div class="card">
+    <h2>2) Employee Data Table</h2>
+    <div class="tools">
+      <input id="q" placeholder="🔍 Search name, role or ID">
+      <select id="filter"><option value="">All roles</option></select>
+      <button class="btn sec" id="csv">⬇ Export CSV</button>
+      <button class="btn sec" id="clear">Clear All</button>
+    </div>
+    <div class="tbl">
+      <table>
+        <thead><tr>
+          <th data-k="id">ID ↕</th><th data-k="name">Name ↕</th><th data-k="role">Role ↕</th><th data-k="salary">Salary ↕</th><th>Actions</th>
+        </tr></thead>
+        <tbody id="body"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+<div id="toast"></div>
 
-    <br>
+<script>
+const $=s=>document.getElementById(s);
+const KEY="emp-manager-v1";
+let emps=[{id:101,name:"raj",role:"Tester",salary:123123}];
+try{const s=localStorage.getItem(KEY);if(s)emps=JSON.parse(s)}catch(e){}
+let editId=null,sortK="id",sortDir=1;
+const fmt=n=>new Intl.NumberFormat("en-IN",{style:"currency",currency:"INR",maximumFractionDigits:0}).format(n);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const persist=()=>{try{localStorage.setItem(KEY,JSON.stringify(emps))}catch(e){}};
+function toast(m){const t=$("toast");t.textContent=m;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),1800)}
 
-    <table border="1" width="100%">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Name</th>
-                <th>Role</th>
-                <th>Salary</th>
-            </tr>
-        </thead>
-        <tbody id="data"></tbody>
-    </table>
+function validate(){
+  let ok=true;const set=(e,m)=>{$(e).textContent=m;if(m)ok=false};
+  const id=$("id").value,n=$("name").value.trim(),r=$("role").value,s=$("salary").value;
+  set("eId",!id||id<=0?"Valid ID required":emps.some(x=>x.id==id&&x.id!==editId)?"ID already exists":"");
+  set("eName",n.length<2?"Name must be 2+ characters":"");
+  set("eRole",!r?"Select a role":"");
+  set("eSal",!s||s<=0?"Valid salary required":"");
+  return ok;
+}
+function save(){
+  if(!validate())return;
+  const e={id:+$("id").value,name:$("name").value.trim(),role:$("role").value,salary:+$("salary").value};
+  if(editId!==null){emps=emps.map(x=>x.id===editId?e:x);toast("Employee updated")}
+  else{emps.push(e);toast("Employee added")}
+  persist();reset();render();
+}
+function reset(){
+  editId=null;["id","name","salary"].forEach(i=>$(i).value="");$("role").value="";
+  ["eId","eName","eRole","eSal"].forEach(i=>$(i).textContent="");
+  $("save").textContent="Add Employee";$("cancel").style.display="none";$("formTitle").textContent="1) Employee Form";
+}
+function edit(id){
+  const e=emps.find(x=>x.id===id);editId=id;
+  $("id").value=e.id;$("name").value=e.name;$("role").value=e.role;$("salary").value=e.salary;
+  $("save").textContent="Update Employee";$("cancel").style.display="";$("formTitle").textContent="1) Edit Employee";
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+function del(id){if(confirm("Delete this employee?")){emps=emps.filter(x=>x.id!==id);persist();render();toast("Deleted")}}
 
-    <script>
-        const form = document.getElementById("form");
-        const table = document.getElementById("data");
-
-        form.onsubmit = (e) => {
-            e.preventDefault();
-
-            const id = document.getElementById("id").value;
-            const name = document.getElementById("name").value;
-            const role = document.getElementById("role").value;
-            const salary = document.getElementById("salary").value;
-            const row = table.insertRow();
-            row.innerHTML = `
-                <td>${id}</td>
-                <td>${name}</td>
-                <td>${role}</td>
-                <td>${salary}</td>
-            `;
-        };
-    </script>
+function render(){
+  const q=$("q").value.toLowerCase(),f=$("filter").value;
+  const roles=[...new Set(emps.map(e=>e.role))].sort();
+  $("filter").innerHTML='<option value="">All roles</option>'+roles.map(r=>`<option${r===f?" selected":""}>${esc(r)}</option>`).join("");
+  const list=emps.filter(e=>(!f||e.role===f)&&(`${e.id} ${e.name} ${e.role}`.toLowerCase().includes(q)))
+    .sort((a,b)=>(a[sortK]>b[sortK]?1:-1)*sortDir);
+  $("body").innerHTML=list.length?list.map(e=>`<tr><td>${e.id}</td><td>${esc(e.name)}</td><td>${esc(e.role)}</td><td>${fmt(e.salary)}</td>
+    <td class="a"><button class="btn sm" onclick="edit(${e.id})">Edit</button><button class="btn sm del" onclick="del(${e.id})">Delete</button></td></tr>`).join("")
+    :'<tr><td colspan="5" class="empty">No employees found</td></tr>';
+  const tot=emps.reduce((s,e)=>s+e.salary,0),top=emps.slice().sort((a,b)=>b.salary-a.salary)[0];
+  $("sCount").textContent=emps.length;$("sTotal").textContent=fmt(tot);
+  $("sAvg").textContent=emps.length?fmt(tot/emps.length):fmt(0);$("sMax").textContent=top?top.name:"-";
+}
+$("save").onclick=save;$("cancel").onclick=reset;
+$("q").oninput=render;$("filter").onchange=render;
+document.querySelectorAll("th[data-k]").forEach(th=>th.onclick=()=>{const k=th.dataset.k;sortDir=sortK===k?-sortDir:1;sortK=k;render()});
+$("clear").onclick=()=>{if(emps.length&&confirm("Delete ALL employees?")){emps=[];persist();render()}};
+$("csv").onclick=()=>{
+  const rows=[["ID","Name","Role","Salary"],...emps.map(e=>[e.id,e.name,e.role,e.salary])];
+  const blob=new Blob([rows.map(r=>r.map(v=>`"${v}"`).join(",")).join("\n")],{type:"text/csv"});
+  const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="employees.csv";a.click();
+};
+$("theme").onclick=()=>{const d=document.documentElement;const dark=getComputedStyle(d).getPropertyValue("--bg").trim()==="#0f172a";d.dataset.theme=dark?"light":"dark"};
+render();
+</script>
 </body>
 </html>
